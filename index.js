@@ -73,7 +73,7 @@ function computeChange(repo, ref, data) {
 
         const [user, repo] = data.repository.full_name.split('/');
 
-        github.statuses.create(
+        github.repos.createStatus(
           {
             state: 'pending',
             context: 'ci/semantic-release',
@@ -100,7 +100,7 @@ function computeChange(repo, ref, data) {
               .then(msg => {
                 msg.user = user;
                 msg.repo = repo;
-                github.statuses.create(msg, error => {
+                github.repos.createStatus(msg, error => {
                   if (error) {
                     console.log(error);
                   }
