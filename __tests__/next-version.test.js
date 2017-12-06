@@ -10,7 +10,7 @@ describe('calculate next change', () => {
     const res = await fn('remy/nodemon', unchanged, '1.0.0');
     // console.log(res);
     expect(res.state).toEqual('success');
-    expect(res.description.includes('unchanged')).toBe(true);
+    expect(res.description).toEqual(expect.stringContaining('no new release'));
   });
 
   test('fix commits increment patch', async () => {
@@ -22,7 +22,7 @@ describe('calculate next change', () => {
 
   test('bad commits submit a failure', async () => {
     const res = await fn('remy/nodemon', bad, '1.0.0');
-    expect(res.state).toEqual('failure');
+    expect(res.state).toEqual(expect.stringContaining('failure'));
     expect(res.description.includes('1.')).toBe(false);
   });
 });

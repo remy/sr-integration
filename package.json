@@ -1,16 +1,15 @@
 {
   "name": "sr-integration",
-  "version": "1.0.0",
-  "description": "A Github integration to resolve the up coming version using semantic release",
+  "version": "1.0.1",
+  "description":
+    "A Github integration to resolve the up coming version using semantic release",
   "main": "index.js",
   "scripts": {
     "start": "node .",
     "test": "jest"
   },
   "jest": {
-    "modulePathIgnorePatterns": [
-      ".eslintrc.js"
-    ]
+    "modulePathIgnorePatterns": [".eslintrc.js"]
   },
   "keywords": [],
   "author": "",

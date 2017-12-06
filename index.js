@@ -71,14 +71,14 @@ function computeChange(repo, ref, data) {
           version = body.version;
         }
 
-        const [user, repo] = data.repository.full_name.split('/');
+        const [owner, repo] = data.repository.full_name.split('/');
 
         github.repos.createStatus(
           {
             state: 'pending',
             context: 'ci/semantic-release',
             sha: data.pull_request.head.sha,
-            user,
+            owner,
             repo,
             description:
               'waiting for all commits to be semantic-release compatible',
@@ -91,24 +91,25 @@ function computeChange(repo, ref, data) {
         github.pullRequests.getCommits(
           {
             repo,
-            user,
+            owner,
             number: data.number,
             per_page: 100,
           },
-          (error, commits) =>
-            processNextVersion(data.repository.full_name, commits, version)
+          (error, commits) => {
+            processNextVersion(data.repository.full_name, commits.data, version)
               .then(msg => {
-                msg.user = user;
+                msg.owner = owner;
                 msg.repo = repo;
                 github.repos.createStatus(msg, error => {
                   if (error) {
                     console.log(error);
                   }
 
-                  console.log('integration worked');
+                  console.log('integration completed', msg.description);
                 });
               })
-              .catch(e => console.log(e.stack))
+              .catch(e => console.log(e.stack));
+          }
         );
       }
     );
@@ -159,14 +160,15 @@ function processNextVersion(repo, data, version) {
 
       return analyzer({}, { commits, logger }).then(res => {
         var next = semver.inc(version, res);
-        if (next === null) {
-          next = version + ' (unchanged)';
+        let description = 'no new release expected';
+        if (next !== null) {
+          description = `expected next release: ${next}`;
         }
 
         return {
           state: 'success',
           context: 'ci/semantic-release',
-          description: 'expected next release: ' + next,
+          description,
           sha: commits.slice(-1).pop().hash,
         };
       });
